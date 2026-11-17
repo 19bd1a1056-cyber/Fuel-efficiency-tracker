@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FleetFuel Manager</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 40px 20px;
+      color: #172554;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px #0001;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 6px;
+    }
+    input { border: 1px solid #cbd5e1; }
+    button {
+      background: #1d4ed8;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #status { margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FleetFuel Manager</h1>
+    <p>Liberty Transit – Fuel Management System</p>
+
+
+    <h3>Employee Login</h3>
+    <input id="email" type="email" placeholder="Company email">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Sign In</button>
+    <p id="status"></p>
+  </div>
+
+
+  <script>
+    const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+    const SUPABASE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const status = document.getElementById("status");
+
+
+      status.textContent = "Signing in...";
+
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+
+      if (error) {
+        status.textContent = error.message;
+        return;
+      }
+
+
+      status.textContent = "Login successful!";
+    }
+  </script>
+</body>
+</html>
