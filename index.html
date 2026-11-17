@@ -507,7 +507,6 @@ function renderDashboard() {
   drivers.map(d => `DIL0`).join("") ||
   "<tr><td>No drivers added.</td></tr>";
 
-
   document.getElementById("fuelVehicle").innerHTML =
     '<option value="">Select vehicle</option>' +
     vehicles.map(v => <option value="${escapeHTML(v.id)}">${escapeHTML(v.reg)}</option>).join("");
