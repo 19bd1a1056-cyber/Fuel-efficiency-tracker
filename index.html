@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FleetFuel Manager | Liberty Transit</title>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
 <style>
 { box-sizing: border-box; }
 body {
@@ -13,14 +17,26 @@ body {
   background: #f1f5f9;
   color: #172554;
 }
+
+
 header {
   background: #10264b;
   color: white;
   padding: 20px 25px;
 }
+
+
 header h1 { margin: 0 0 5px; }
 header p { margin: 0; color: #cbd5e1; }
-.container { max-width: 1150px; margin: auto; padding: 25px; }
+
+
+.container {
+  max-width: 1150px;
+  margin: auto;
+  padding: 25px;
+}
+
+
 .card {
   background: white;
   padding: 20px;
@@ -28,6 +44,8 @@ header p { margin: 0; color: #cbd5e1; }
   margin-bottom: 20px;
   box-shadow: 0 2px 8px #0000000d;
 }
+
+
 input, select, button {
   width: 100%;
   padding: 12px;
@@ -36,6 +54,8 @@ input, select, button {
   border: 1px solid #cbd5e1;
   font-size: 15px;
 }
+
+
 button {
   background: #1d4ed8;
   color: white;
@@ -43,37 +63,74 @@ button {
   cursor: pointer;
   font-weight: bold;
 }
+
+
 button:hover { background: #1e40af; }
 .secondary { background: #475569; }
+
+
 .tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 20px;
 }
-.tabs button { width: auto; padding: 12px 18px; }
+
+
+.tabs button {
+  width: auto;
+  padding: 12px 18px;
+}
+
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 15px;
 }
+
+
 .metric {
   background: #eff6ff;
   padding: 18px;
   border-radius: 10px;
 }
-.metric h2 { margin: 8px 0 0; font-size: 25px; }
-.metric p { margin: 0; color: #475569; }
+
+
+.metric h2 {
+  margin: 8px 0 0;
+  font-size: 25px;
+}
+
+
+.metric p {
+  margin: 0;
+  color: #475569;
+}
+
+
 .section { display: none; }
 .section.active { display: block; }
-table { width: 100%; border-collapse: collapse; min-width: 550px; }
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 550px;
+}
+
+
 th, td {
   padding: 12px;
   text-align: left;
   border-bottom: 1px solid #e2e8f0;
 }
+
+
 th { background: #eff6ff; }
 .table-wrap { overflow-x: auto; }
+
+
 #status, .message { margin-top: 12px; }
 .error { color: #b91c1c; }
 .success { color: #15803d; }
@@ -81,6 +138,8 @@ th { background: #eff6ff; }
 .hidden { display: none !important; }
 </style>
 </head>
+
+
 <body>
 
 
@@ -93,15 +152,23 @@ th { background: #eff6ff; }
 <div class="container">
 
 
+  <!-- LOGIN -->
   <div class="card" id="loginPanel">
     <h2>Employee Login</h2>
+
+
     <input id="email" type="email" placeholder="Company email">
     <input id="password" type="password" placeholder="Password">
+
+
     <button onclick="login()">Sign In</button>
+
+
     <p id="status"></p>
   </div>
 
 
+  <!-- DASHBOARD -->
   <div id="dashboard" class="hidden">
 
 
@@ -111,11 +178,16 @@ th { background: #eff6ff; }
           <h2>Fleet Dashboard</h2>
           <p class="small">Welcome to Liberty Transit FleetFuel Manager</p>
         </div>
-        <button class="secondary" style="width:auto" onclick="logout()">Sign Out</button>
+
+
+        <button class="secondary" style="width:auto" onclick="logout()">
+          Sign Out
+        </button>
       </div>
     </div>
 
 
+    <!-- NAVIGATION -->
     <div class="tabs">
       <button onclick="showSection('overview')">Overview</button>
       <button onclick="showSection('vehicles')">Vehicles</button>
@@ -124,29 +196,44 @@ th { background: #eff6ff; }
     </div>
 
 
+    <!-- OVERVIEW -->
     <section id="overview" class="section active">
+
+
       <div class="metric-grid">
+
+
         <div class="metric">
           <p>Total Vehicles</p>
           <h2 id="vehicleCount">0</h2>
         </div>
+
+
         <div class="metric">
           <p>Total Drivers</p>
           <h2 id="driverCount">0</h2>
         </div>
+
+
         <div class="metric">
           <p>Fuel Recorded</p>
           <h2 id="fuelTotal">0 gal</h2>
         </div>
+
+
         <div class="metric">
           <p>Average MPG</p>
           <h2 id="averageMpg">—</h2>
         </div>
+
+
       </div>
 
 
       <div class="card" style="margin-top:20px">
         <h3>Recent Fuel Entries</h3>
+
+
         <div class="table-wrap">
           <table>
             <thead>
@@ -158,61 +245,133 @@ th { background: #eff6ff; }
                 <th>Fuel (gallons)</th>
               </tr>
             </thead>
+
+
             <tbody id="recentFuel"></tbody>
           </table>
         </div>
-        <p class="small">MPG is calculated from consecutive odometer readings for each vehicle. The first entry for a vehicle establishes its starting reading.</p>
+
+
+        <p class="small">
+          MPG is calculated using consecutive odometer readings for each vehicle.
+          The first entry establishes the starting reading.
+        </p>
       </div>
+
+
     </section>
 
 
+    <!-- VEHICLES -->
     <section id="vehicles" class="section">
+
+
       <div class="card">
         <h2>Add Vehicle</h2>
+
+
         <form id="vehicleForm">
-          <input id="vehicleReg" placeholder="Vehicle registration / unit number" required>
-          <input id="vehicleDesc" placeholder="Vehicle description">
+          <input
+            id="vehicleReg"
+            placeholder="Vehicle registration / unit number"
+            required
+          >
+
+
+          <input
+            id="vehicleDesc"
+            placeholder="Vehicle description"
+          >
+
+
           <button type="submit">Add Vehicle</button>
         </form>
+
+
         <p id="vehicleMessage" class="message"></p>
       </div>
+
+
       <div class="card">
         <h3>Vehicle List</h3>
+
+
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Registration</th><th>Description</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Registration</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+
+
             <tbody id="vehicleRows"></tbody>
           </table>
         </div>
       </div>
+
+
     </section>
 
 
+    <!-- DRIVERS -->
     <section id="drivers" class="section">
+
+
       <div class="card">
         <h2>Add Driver</h2>
+
+
         <form id="driverForm">
-          <input id="driverName" placeholder="Driver full name" required>
+          <input
+            id="driverName"
+            placeholder="Driver full name"
+            required
+          >
+
+
           <button type="submit">Add Driver</button>
         </form>
+
+
         <p id="driverMessage" class="message"></p>
       </div>
+
+
       <div class="card">
         <h3>Driver List</h3>
+
+
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Driver Name</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Driver Name</th>
+              </tr>
+            </thead>
+
+
             <tbody id="driverRows"></tbody>
           </table>
         </div>
       </div>
+
+
     </section>
 
 
+    <!-- FUEL ENTRIES -->
     <section id="fuel" class="section">
+
+
       <div class="card">
         <h2>Record Fuel Entry</h2>
+
+
         <form id="fuelForm">
+
+
           <label>Vehicle</label>
           <select id="fuelVehicle" required>
             <option value="">Select vehicle</option>
@@ -230,22 +389,47 @@ th { background: #eff6ff; }
 
 
           <label>Odometer (miles)</label>
-          <input id="fuelOdo" type="number" min="0" step="0.1" placeholder="Enter odometer in miles" required>
+          <input
+            id="fuelOdo"
+            type="number"
+            min="0"
+            step="0.1"
+            placeholder="Enter odometer in miles"
+            required
+          >
 
 
           <label>Fuel Quantity (gallons)</label>
-          <input id="fuelGallons" type="number" min="0.01" step="0.01" placeholder="Enter gallons" required>
+          <input
+            id="fuelGallons"
+            type="number"
+            min="0.01"
+            step="0.01"
+            placeholder="Enter gallons"
+            required
+          >
 
 
           <button type="submit">Save Fuel Entry</button>
+
+
         </form>
-        <p class="small">Miles and gallons are converted into kilometres and litres before being saved in your existing database.</p>
+
+
+        <p class="small">
+          Miles and gallons are converted into kilometres and litres
+          before being saved in your existing database.
+        </p>
+
+
         <p id="fuelMessage" class="message"></p>
       </div>
 
 
       <div class="card">
         <h3>All Fuel Entries</h3>
+
+
         <div class="table-wrap">
           <table>
             <thead>
@@ -258,27 +442,49 @@ th { background: #eff6ff; }
                 <th>MPG</th>
               </tr>
             </thead>
+
+
             <tbody id="fuelRows"></tbody>
           </table>
         </div>
       </div>
+
+
     </section>
 
 
     <p id="dashboardStatus"></p>
+
+
   </div>
 </div>
 
 
 <script>
-const SUPABASE_URL = "https://fwwjvmtkjqavgcxsfpba.supabase.co";
-const SUPABASE_KEY = "YOUR_PUBLISHABLE_KEY";
+
+
+// ==================================
+// SUPABASE CONNECTION
+// ==================================
+
+
+const SUPABASE_URL =
+  "https://fwwjvmtkjqavgcxsfpba.supabase.co";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_PXhsH0Bk6kbTOrfbcnxF_Q_zBodNV1j";
 
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
+
+
+// ==================================
+// GLOBAL VARIABLES
+// ==================================
 
 
 let vehicles = [];
@@ -288,6 +494,11 @@ let fuelEntries = [];
 
 const KM_PER_MILE = 1.609344;
 const LITRES_PER_GALLON = 3.785411784;
+
+
+// ==================================
+// HELPER FUNCTIONS
+// ==================================
 
 
 function escapeHTML(value) {
@@ -303,12 +514,23 @@ function escapeHTML(value) {
 
 function showMessage(id, message, isError = false) {
   const el = document.getElementById(id);
+
+
   el.textContent = message;
-  el.className = isError ? "message error" : "message success";
+  el.className = isError
+    ? "message error"
+    : "message success";
 }
 
 
+// ==================================
+// LOGIN
+// ==================================
+
+
 async function login() {
+
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const status = document.getElementById("status");
@@ -323,10 +545,11 @@ async function login() {
   status.textContent = "Signing in...";
 
 
-  const { error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
-  });
+  const { error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
 
 
   if (error) {
@@ -336,50 +559,146 @@ async function login() {
 
 
   status.textContent = "Login successful!";
+
+
   await openDashboard();
 }
 
 
+// ==================================
+// OPEN DASHBOARD
+// ==================================
+
+
 async function openDashboard() {
-  document.getElementById("loginPanel").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
+
+
+  document.getElementById("loginPanel")
+    .classList.add("hidden");
+
+
+  document.getElementById("dashboard")
+    .classList.remove("hidden");
+
+
   await loadAllData();
 }
 
 
+// ==================================
+// LOGOUT
+// ==================================
+
+
 async function logout() {
-  await supabaseClient.auth.signOut();
-  document.getElementById("dashboard").classList.add("hidden");
-  document.getElementById("loginPanel").classList.remove("hidden");
+
+
+  const { error } = await supabaseClient.auth.signOut();
+
+
+  if (error) {
+    document.getElementById("dashboardStatus").textContent =
+      error.message;
+    return;
+  }
+
+
+  document.getElementById("dashboard")
+    .classList.add("hidden");
+
+
+  document.getElementById("loginPanel")
+    .classList.remove("hidden");
+
+
   document.getElementById("password").value = "";
-  document.getElementById("status").textContent = "You have signed out.";
+
+
+  document.getElementById("status").textContent =
+    "You have signed out.";
 }
+
+
+// ==================================
+// NAVIGATION
+// ==================================
 
 
 function showSection(sectionId) {
+
+
   document.querySelectorAll(".section").forEach(section => {
     section.classList.remove("active");
   });
-  document.getElementById(sectionId).classList.add("active");
+
+
+  document.getElementById(sectionId)
+    .classList.add("active");
 }
 
 
+// ==================================
+// LOAD DATABASE DATA
+// ==================================
+
+
 async function loadAllData() {
+
+
   const status = document.getElementById("dashboardStatus");
+
+
   status.textContent = "Loading fleet data...";
 
 
-  const [vehicleResult, driverResult, fuelResult] = await Promise.all([
-    supabaseClient.from("vehicles").select("*").order("created_at", {ascending:false}),
-    supabaseClient.from("drivers").select("*").order("created_at", {ascending:false}),
-    supabaseClient.from("fuel_entries").select("*").order("entry_date", {ascending:false})
+  const [
+    vehicleResult,
+    driverResult,
+    fuelResult
+  ] = await Promise.all([
+
+
+    supabaseClient
+      .from("vehicles")
+      .select("*")
+      .order("created_at", { ascending: false }),
+
+
+    supabaseClient
+      .from("drivers")
+      .select("*")
+      .order("created_at", { ascending: false }),
+
+
+    supabaseClient
+      .from("fuel_entries")
+      .select("*")
+      .order("entry_date", { ascending: false })
+
+
   ]);
 
 
-  if (vehicleResult.error || driverResult.error || fuelResult.error) {
-    const error = vehicleResult.error || driverResult.error || fuelResult.error;
-    status.textContent = "Could not load data: " + error.message;
+  if (
+    vehicleResult.error ||
+    driverResult.error ||
+    fuelResult.error
+  ) {
+
+
+    const error =
+      vehicleResult.error ||
+      driverResult.error ||
+      fuelResult.error;
+
+
+    status.textContent =
+      "Could not load data: " + error.message;
+
+
     status.className = "error";
+
+
     return;
   }
 
@@ -390,20 +709,44 @@ async function loadAllData() {
 
 
   renderDashboard();
+
+
   status.textContent = "";
 }
 
 
+// ==================================
+// GET VEHICLE AND DRIVER NAMES
+// ==================================
+
+
 function getVehicleName(id) {
-  const vehicle = vehicles.find(v => String(v.id) === String(id));
+
+
+  const vehicle = vehicles.find(
+    v => String(v.id) === String(id)
+  );
+
+
   return vehicle ? vehicle.reg : "Unknown vehicle";
 }
 
 
 function getDriverName(id) {
-  const driver = drivers.find(d => String(d.id) === String(id));
+
+
+  const driver = drivers.find(
+    d => String(d.id) === String(id)
+  );
+
+
   return driver ? driver.name : "Unknown driver";
 }
+
+
+// ==================================
+// UNIT CONVERSIONS
+// ==================================
 
 
 function getMiles(entry) {
@@ -416,7 +759,14 @@ function getGallons(entry) {
 }
 
 
+// ==================================
+// MPG CALCULATION
+// ==================================
+
+
 function getMpgByEntry() {
+
+
   const sorted = [...fuelEntries].sort((a, b) =>
     String(a.entry_date).localeCompare(String(b.entry_date)) ||
     Number(a.odo_km) - Number(b.odo_km)
@@ -428,14 +778,25 @@ function getMpgByEntry() {
 
 
   sorted.forEach(entry => {
+
+
     const key = String(entry.vehicle_id);
+
+
     const currentMiles = getMiles(entry);
     const gallons = getGallons(entry);
+
+
     let mpg = null;
 
 
     if (previousByVehicle[key] !== undefined) {
-      const distance = currentMiles - previousByVehicle[key];
+
+
+      const distance =
+        currentMiles - previousByVehicle[key];
+
+
       if (distance > 0 && gallons > 0) {
         mpg = distance / gallons;
       }
@@ -443,7 +804,11 @@ function getMpgByEntry() {
 
 
     results[String(entry.id)] = mpg;
+
+
     previousByVehicle[key] = currentMiles;
+
+
   });
 
 
@@ -451,13 +816,25 @@ function getMpgByEntry() {
 }
 
 
+// ==================================
+// RENDER DASHBOARD
+// ==================================
+
+
 function renderDashboard() {
-  document.getElementById("vehicleCount").textContent = vehicles.length;
-  document.getElementById("driverCount").textContent = drivers.length;
+
+
+  document.getElementById("vehicleCount").textContent =
+    vehicles.length;
+
+
+  document.getElementById("driverCount").textContent =
+    drivers.length;
 
 
   const totalGallons = fuelEntries.reduce(
-    (sum, entry) => sum + getGallons(entry), 0
+    (sum, entry) => sum + getGallons(entry),
+    0
   );
 
 
@@ -466,6 +843,8 @@ function renderDashboard() {
 
 
   const mpgResults = getMpgByEntry();
+
+
   let totalDistance = 0;
   let totalGallonsForMpg = 0;
 
@@ -480,13 +859,28 @@ function renderDashboard() {
 
 
   sorted.forEach(entry => {
+
+
     const key = String(entry.vehicle_id);
     const miles = getMiles(entry);
-    if (previous[key] !== undefined && miles > previous[key]) {
+
+
+    if (
+      previous[key] !== undefined &&
+      miles > previous[key]
+    ) {
+
+
       totalDistance += miles - previous[key];
+
+
       totalGallonsForMpg += getGallons(entry);
     }
+
+
     previous[key] = miles;
+
+
   });
 
 
@@ -496,25 +890,72 @@ function renderDashboard() {
       : "—";
 
 
+  // VEHICLE TABLE
+
+
   document.getElementById("vehicleRows").innerHTML =
-    vehicles.map(v => `<tr>
-      <td>${escapeHTML(v.reg)}</td>
-      <td>${escapeHTML(v.desc || "")}</td>
-    </tr>`).join("") || "<tr><td colspan='2'>No vehicles added.</td></tr>";
+
+
+    vehicles.map(v =>
+      `<tr>
+        <td>${escapeHTML(v.reg)}</td>
+        <td>${escapeHTML(v.desc || "")}</td>
+      </tr>`
+    ).join("") ||
+
+
+    "<tr><td colspan='2'>No vehicles added.</td></tr>";
+
+
+  // DRIVER TABLE
 
 
   document.getElementById("driverRows").innerHTML =
-  drivers.map(d => `DIL0`).join("") ||
-  "<tr><td>No drivers added.</td></tr>";
+
+
+    drivers.map(d =>
+      `<tr>
+        <td>${escapeHTML(d.name)}</td>
+      </tr>`
+    ).join("") ||
+
+
+    "<tr><td>No drivers added.</td></tr>";
+
+
+  // VEHICLE DROPDOWN
+
 
   document.getElementById("fuelVehicle").innerHTML =
+
+
     '<option value="">Select vehicle</option>' +
-    vehicles.map(v => '<option value="${escapeHTML(v.id)}">${escapeHTML(v.reg)}</option>').join("");
+
+
+    vehicles.map(v =>
+      `<option value="${escapeHTML(v.id)}">
+        ${escapeHTML(v.reg)}
+      </option>`
+    ).join("");
+
+
+  // DRIVER DROPDOWN
 
 
   document.getElementById("fuelDriver").innerHTML =
+
+
     '<option value="">Select driver</option>' +
-    drivers.map(d => '<option value="${escapeHTML(d.id)}">${escapeHTML(d.name)}</option>').join("");
+
+
+    drivers.map(d =>
+      `<option value="${escapeHTML(d.id)}">
+        ${escapeHTML(d.name)}
+      </option>`
+    ).join("");
+
+
+  // SORT FUEL ENTRIES
 
 
   const rows = [...fuelEntries].sort((a, b) =>
@@ -522,129 +963,306 @@ function renderDashboard() {
   );
 
 
+  // FUEL TABLE
+
+
   document.getElementById("fuelRows").innerHTML =
+
+
     rows.map(entry => {
+
+
       const mpg = mpgResults[String(entry.id)];
+
+
       return `<tr>
         <td>${escapeHTML(entry.entry_date)}</td>
         <td>${escapeHTML(getVehicleName(entry.vehicle_id))}</td>
         <td>${escapeHTML(getDriverName(entry.driver_id))}</td>
         <td>${getMiles(entry).toFixed(1)}</td>
         <td>${getGallons(entry).toFixed(2)}</td>
-        <td>${mpg !== null && mpg !== undefined ? mpg.toFixed(1) : "—"}</td>
+        <td>${mpg !== null && mpg !== undefined
+          ? mpg.toFixed(1)
+          : "—"}</td>
       </tr>`;
-    }).join("") || "<tr><td colspan='6'>No fuel entries recorded.</td></tr>";
+
+
+    }).join("") ||
+
+
+    "<tr><td colspan='6'>No fuel entries recorded.</td></tr>";
+
+
+  // RECENT FUEL ENTRIES
 
 
   document.getElementById("recentFuel").innerHTML =
-    rows.slice(0, 5).map(entry => `<tr>
-      <td>${escapeHTML(entry.entry_date)}</td>
-      <td>${escapeHTML(getVehicleName(entry.vehicle_id))}</td>
-      <td>${escapeHTML(getDriverName(entry.driver_id))}</td>
-      <td>${getMiles(entry).toFixed(1)}</td>
-      <td>${getGallons(entry).toFixed(2)}</td>
-    </tr>`).join("") || "<tr><td colspan='5'>No fuel entries yet.</td></tr>";
+
+
+    rows.slice(0, 5).map(entry =>
+      `<tr>
+        <td>${escapeHTML(entry.entry_date)}</td>
+        <td>${escapeHTML(getVehicleName(entry.vehicle_id))}</td>
+        <td>${escapeHTML(getDriverName(entry.driver_id))}</td>
+        <td>${getMiles(entry).toFixed(1)}</td>
+        <td>${getGallons(entry).toFixed(2)}</td>
+      </tr>`
+    ).join("") ||
+
+
+    "<tr><td colspan='5'>No fuel entries yet.</td></tr>";
+
+
 }
 
 
-document.getElementById("vehicleForm").addEventListener("submit", async event => {
+// ==================================
+// ADD VEHICLE
+// ==================================
+
+
+document.getElementById("vehicleForm")
+.addEventListener("submit", async event => {
+
+
   event.preventDefault();
 
 
-  const reg = document.getElementById("vehicleReg").value.trim();
-  const desc = document.getElementById("vehicleDesc").value.trim();
+  const reg =
+    document.getElementById("vehicleReg").value.trim();
 
 
-  const { error } = await supabaseClient.from("vehicles").insert([{reg, desc}]);
+  const desc =
+    document.getElementById("vehicleDesc").value.trim();
+
+
+  const { error } =
+    await supabaseClient
+      .from("vehicles")
+      .insert([{ reg, desc }]);
 
 
   if (error) {
+
+
     showMessage("vehicleMessage", error.message, true);
+
+
     return;
   }
 
 
   document.getElementById("vehicleForm").reset();
-  showMessage("vehicleMessage", "Vehicle added successfully.");
+
+
+  showMessage(
+    "vehicleMessage",
+    "Vehicle added successfully."
+  );
+
+
   await loadAllData();
+
+
 });
 
 
-document.getElementById("driverForm").addEventListener("submit", async event => {
+// ==================================
+// ADD DRIVER
+// ==================================
+
+
+document.getElementById("driverForm")
+.addEventListener("submit", async event => {
+
+
   event.preventDefault();
 
 
-  const name = document.getElementById("driverName").value.trim();
+  const name =
+    document.getElementById("driverName").value.trim();
 
 
-  const { error } = await supabaseClient.from("drivers").insert([{name}]);
+  const { error } =
+    await supabaseClient
+      .from("drivers")
+      .insert([{ name }]);
 
 
   if (error) {
+
+
     showMessage("driverMessage", error.message, true);
+
+
     return;
   }
 
 
   document.getElementById("driverForm").reset();
-  showMessage("driverMessage", "Driver added successfully.");
+
+
+  showMessage(
+    "driverMessage",
+    "Driver added successfully."
+  );
+
+
   await loadAllData();
+
+
 });
 
 
-document.getElementById("fuelForm").addEventListener("submit", async event => {
+// ==================================
+// ADD FUEL ENTRY
+// ==================================
+
+
+document.getElementById("fuelForm")
+.addEventListener("submit", async event => {
+
+
   event.preventDefault();
 
 
-  const vehicle_id = document.getElementById("fuelVehicle").value;
-  const driver_id = document.getElementById("fuelDriver").value;
-  const entry_date = document.getElementById("fuelDate").value;
-  const miles = Number(document.getElementById("fuelOdo").value);
-  const gallons = Number(document.getElementById("fuelGallons").value);
+  const vehicle_id =
+    document.getElementById("fuelVehicle").value;
 
 
-  if (!vehicle_id || !driver_id || !entry_date || miles < 0 || gallons <= 0) {
-    showMessage("fuelMessage", "Please enter valid fuel information.", true);
+  const driver_id =
+    document.getElementById("fuelDriver").value;
+
+
+  const entry_date =
+    document.getElementById("fuelDate").value;
+
+
+  const miles =
+    Number(document.getElementById("fuelOdo").value);
+
+
+  const gallons =
+    Number(document.getElementById("fuelGallons").value);
+
+
+  if (
+    !vehicle_id ||
+    !driver_id ||
+    !entry_date ||
+    !Number.isFinite(miles) ||
+    !Number.isFinite(gallons) ||
+    miles < 0 ||
+    gallons <= 0
+  ) {
+
+
+    showMessage(
+      "fuelMessage",
+      "Please enter valid fuel information.",
+      true
+    );
+
+
     return;
   }
 
 
-  const odo_km = Number((miles * KM_PER_MILE).toFixed(3));
-  const litres = Number((gallons * LITRES_PER_GALLON).toFixed(3));
+  // CONVERT MILES TO KILOMETRES
 
 
-  const { error } = await supabaseClient.from("fuel_entries").insert([{
-    vehicle_id,
-    driver_id,
-    entry_date,
-    odo_km,
-    litres
-  }]);
+  const odo_km = Number(
+    (miles * KM_PER_MILE).toFixed(3)
+  );
+
+
+  // CONVERT GALLONS TO LITRES
+
+
+  const litres = Number(
+    (gallons * LITRES_PER_GALLON).toFixed(3)
+  );
+
+
+  const { error } =
+    await supabaseClient
+      .from("fuel_entries")
+      .insert([{
+        vehicle_id,
+        driver_id,
+        entry_date,
+        odo_km,
+        litres
+      }]);
 
 
   if (error) {
+
+
     showMessage("fuelMessage", error.message, true);
+
+
     return;
   }
 
 
   document.getElementById("fuelForm").reset();
-  showMessage("fuelMessage", "Fuel entry saved successfully.");
+
+
+  document.getElementById("fuelDate").value =
+    new Date().toISOString().slice(0, 10);
+
+
+  showMessage(
+    "fuelMessage",
+    "Fuel entry saved successfully."
+  );
+
+
   await loadAllData();
+
+
 });
+
+
+// ==================================
+// DEFAULT DATE
+// ==================================
 
 
 document.getElementById("fuelDate").value =
   new Date().toISOString().slice(0, 10);
 
 
-supabaseClient.auth.getSession().then(({data, error}) => {
+// ==================================
+// CHECK EXISTING LOGIN SESSION
+// ==================================
+
+
+supabaseClient.auth.getSession().then(({ data, error }) => {
+
+
   if (error) {
-    document.getElementById("status").textContent = error.message;
+
+
+    document.getElementById("status").textContent =
+      error.message;
+
+
     return;
   }
-  if (data.session) openDashboard();
+
+
+  if (data.session) {
+    openDashboard();
+  }
+
+
 });
+
+
 </script>
+
+
 </body>
 </html>
